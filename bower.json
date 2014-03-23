@@ -1,0 +1,22 @@
+{
+  "name": "rolling-diff",
+  "version": "0.0.0",
+  "exportsOverride": {
+    "bootstrap-*": {
+      "js": "**/*.js",
+      "css": "**/*.css"
+    },
+    "jquery": {
+      "js": "dist/*.js",
+      "css": "dist/*.css"
+    },
+    "*": {
+      "js": "**/*.js",
+      "css": "**/*.css"
+    }
+  },
+  "dependencies": {
+    "sass-bootstrap": "~3.0.2",
+    "jquery": "~2.1.0"
+  }
+}

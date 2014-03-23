@@ -1,0 +1,34 @@
+/* line 2, ../scss/main.scss */
+p {
+  margin: 0 0 10px;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  height: auto;
+}
+
+/* line 9, ../scss/main.scss */
+.display {
+  width: 50%;
+  float: left;
+}
+
+/* line 14, ../scss/main.scss */
+.pidChar {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+/* line 20, ../scss/main.scss */
+.diffChar {
+  background: lightgray;
+  display: inline-block;
+  padding: 0 2px;
+  font-size: 12px;
+}
+/* line 26, ../scss/main.scss */
+.diffChar.newChar {
+  font-weight: bolder;
+  background: lightgreen;
+  border: 1px solid green;
+}
