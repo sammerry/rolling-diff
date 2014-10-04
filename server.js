@@ -17,6 +17,8 @@ var redis = require('redis');
 
 
 app.configure(function () {
+  'use strict';
+
   // I need to access everything in '/public' directly
   app.use(express.static(__dirname + '/public'));
 
@@ -29,6 +31,8 @@ app.configure(function () {
 
 
 app.get('/', function (req, res) {
+  'use strict';
+
   res.render('index', {});
 });
 
@@ -36,29 +40,32 @@ app.get('/', function (req, res) {
 
 
 
-var knownPids = [];
 
 
 
 
 
-function pushMessage (channel, message) {
-  var pid = channel.split(':')[1];
-  console.log(pid)
-  io.sockets.emit(pid.toString(), {query:pid, msg:message});
+function pushMessage (pattern, channel, message) {
+  'use strict';
+
+  console.log(arguments);
+  io.sockets.emit(channel, {query:channel, msg:message});
 }
 
 
 
 
 
-function manageKnownIds (channel, message) {
-  var pid = channel.split(':')[1];
-  if (knownPids.indexOf(pid)<0) {
-    knownPids.push(pid.toString());
+var knownIds = [];
+
+function manageKnownIds (pattern, channel, message) {
+  'use strict';
+
+  if (knownIds.indexOf(channel)<0) {
+    console.log('added channel')
+    knownIds.push(channel);
   }
 }
-
 
 
 
@@ -71,24 +78,18 @@ function manageDisconnect () {
 }
 
 
-
-var pidClient = redis.createClient();
-pidClient.subscribe('ids');
-pidClient.on('message', function (channel, message) {
-  io.sockets.emit('pids', {msg:message.split(',')});
-});
-
-
-
 io.sockets.on('connection', function (socket) {
+  'use strict';
+
   var rc = redis.createClient();
   var query = socket.handshake.query || {};
-  var listenID = query.pid;
-  var pattern = 'obd:' + listenID;
+  var listenID = query.id;
+  var pattern = 'id:*';
 
-  rc.subscribe(pattern);
-  rc.addListener('message', pushMessage);
-  rc.on('message', manageKnownIds);
+  rc.psubscribe(pattern);
+  rc.on('pmessage', pushMessage);
+  rc.on('pmessage', manageKnownIds);
+  io.sockets.emit('ids', {msg:knownIds});
   socket.on('disconnect', manageDisconnect.bind(rc));
 });
 

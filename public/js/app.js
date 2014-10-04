@@ -8,13 +8,13 @@
 // use a query parameter to select starting pid
 // or look for all of them.
 var search = document.location.search;
-var pidMatch = search.match(/[?&]pid=([^&$]+)/) || [];
-var trafficid = pidMatch[1] || 'obd';
+var pidMatch = search.match(/[?&]id=([^&$]+)/) || [];
+var trafficid = pidMatch[1] || 'id:*';
 
 
 
 // connect to our socket server
-var socket = io.connect('http://127.0.0.1:3000/', {query: "pid="+trafficid});
+var socket = io.connect('http://127.0.0.1:3000/', {query: "id="+trafficid});
 var app = app || {};
 
 
@@ -38,13 +38,13 @@ $(function () {
 
 
   //SOCKET STUFF
-  socket.on('pids', function (data) {
+  socket.on('ids', function (data) {
     var len = data.msg.length;
 
     $allPostsTextArea.text('');
     while (len--) {
       var id = data.msg[len];
-      var $newPid = $('<p><a href="/?pid='+id+'">'+id+'</a></p>');
+      var $newPid = $('<p><a href="/?id='+id+'">'+id+'</a></p>');
 
       $allPostsTextArea.append($newPid);
     }
