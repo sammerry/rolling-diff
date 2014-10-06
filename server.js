@@ -4,28 +4,51 @@
 //
 **************************************/
 
-// express magic
-var express = require('express');
+var express = require('express'),
+    nconf = require('nconf'),
+
+    winston = require('winston');
+
+// take variables first from env
+// then from argv then from a file.
+nconf.env().argv();
+nconf.file('./settings.json');
+
+require('newrelic');
+
 var app = express();
 var server = require('http').createServer(app);
 var device  = require('express-device');
-
 var io = require('socket.io').listen(server);
 var redis = require('redis');
 
-// var runningPortNumber = process.env.PORT;
 
 
+
+
+
+// logger settings
+var logLevel = 'info';
+if (nconf.get('NODE_ENV') === 'production') {
+  logLevel = 'warn';
+}
+
+var logger = new (winston.Logger)({
+  transports: [new (winston.transports.Console)({level: logLevel})]
+});
+
+
+
+
+
+
+// express server settings (static assets only)
 app.configure(function () {
   'use strict';
 
-  // I need to access everything in '/public' directly
   app.use(express.static(__dirname + '/public'));
-
-  //set the view engine
   app.set('view engine', 'ejs');
   app.set('views', __dirname + '/views');
-
   app.use(device.capture());
 });
 
@@ -44,16 +67,13 @@ app.get('/', function (req, res) {
 
 
 
-
+// socket.io
 function pushMessage (pattern, channel, message) {
   'use strict';
 
-  console.log(arguments);
+  logger.log('info', 'arguments', arguments);
   io.sockets.emit(channel, {query:channel, msg:message});
 }
-
-
-
 
 
 var knownIds = [];
@@ -62,17 +82,15 @@ function manageKnownIds (pattern, channel, message) {
   'use strict';
 
   if (knownIds.indexOf(channel)<0) {
-    console.log('added channel')
+    logger.log('info','added channel');
     knownIds.push(channel);
   }
 }
 
 
-
-
 function manageDisconnect () {
   var rc = this;
-  console.log('disconnect, attempting socket deletion.');
+  logger.log('info', 'disconnect, attempting socket deletion.');
   rc.quit();
   delete socket;
 }
@@ -81,7 +99,11 @@ function manageDisconnect () {
 io.sockets.on('connection', function (socket) {
   'use strict';
 
-  var rc = redis.createClient();
+  var url = require("url").parse(nconf.get('REDISCLOUD_URL') || 'localhost:');
+  var rc = redis.createClient(url.port, url.hostname, {no_ready_check: true});
+  rc.auth(url.auth.split(":")[1]);
+
+
   var query = socket.handshake.query || {};
   var listenID = query.id;
   var pattern = 'id:*';
@@ -94,7 +116,5 @@ io.sockets.on('connection', function (socket) {
 });
 
 
-
-
-server.listen(3000);
+server.listen(nconf.get('PORT') || 3000);
 

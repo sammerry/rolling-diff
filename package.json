@@ -7,13 +7,17 @@
   "private": true,
   "repository": "",
   "dependencies": {
-    "express": "~3.4.6",
-    "socket.io": "~0.9.16",
     "ejs": "~0.8.5",
+    "express": "~3.4.6",
     "express-device": "~0.3.7",
+    "mqtt": "^0.3.12",
+    "nconf": "^0.6.9",
+    "newrelic": "^1.11.4",
     "redis": "~0.10.1",
     "serialport": "~1.3.1",
-    "sf": "~0.1.7"
+    "sf": "~0.1.7",
+    "socket.io": "~0.9.16",
+    "winston": "^0.8.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

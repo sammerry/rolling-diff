@@ -14,18 +14,19 @@ var trafficid = pidMatch[1] || 'id:*';
 
 
 // connect to our socket server
-var socket = io.connect('http://127.0.0.1:3000/', {query: "id="+trafficid});
+var socket = io.connect('http://socketio-node-hydro.herokuapp.com', {query: "id="+trafficid});
 var app = app || {};
 
 
 $(function () {
+  'use strict';
 
   //setup some common vars
   var $blastField = $('#blast'),
       $filterPids = $('#filterPids'),
       $allPostsTextArea = $('#allPosts'),
       $clearAllPosts = $('#clearAllChatter'),
-      $clearAllPosts2 = $('#clearAllDiff');
+      $clearAllPosts2 = $('#clearAllDiff'),
       $sendBlastButton = $('#send'),
       prevMessage = '',
       knownPids = [];
